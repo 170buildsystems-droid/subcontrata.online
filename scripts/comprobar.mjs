@@ -3,6 +3,7 @@ import { readdir, readFile, stat } from "node:fs/promises";
 import { join, relative } from "node:path";
 
 const DIST = "dist";
+const BASE = (process.env.BASE_PATH || "").replace(/\/$/, "");
 const errores = [];
 const avisos = [];
 
@@ -35,7 +36,7 @@ for (const f of ficheros) {
     for (const k of ["utm_source=", "utm_medium=landing", "utm_campaign=", "utm_content="]) if (!u.includes(k)) errores.push(`${rel}: CTA sin ${k}`);
   }
   for (const m of src.matchAll(/href="(\/[^"#?]*)/g)) {
-    const h = m[1];
+    const h = BASE && m[1].startsWith(BASE + "/") ? m[1].slice(BASE.length) : m[1];
     const cands = h.endsWith("/") ? [join(DIST, h, "index.html")] : [join(DIST, h + ".html"), join(DIST, h), join(DIST, h, "index.html")];
     let ok = false;
     for (const c of cands) if (await existe(c)) { ok = true; break; }
