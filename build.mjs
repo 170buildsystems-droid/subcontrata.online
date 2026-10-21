@@ -116,6 +116,7 @@ ${gtm}
 ${ld.map((o) => `<script type="application/ld+json">${JSON.stringify(o)}</script>`).join("\n")}
 </head>
 <body>
+${SITIO.gtmId ? `<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=${SITIO.gtmId}" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>` : ""}
 <a class="saltar" href="#contenido">Saltar al contenido</a>
 <header class="cabecera">
   <div class="contenedor cabecera-int">

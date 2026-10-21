@@ -12,7 +12,7 @@ export const SITIO = {
   domicilio: "Calle Luis Vives, 7 — 12580 (Castellón)",
   email: "legal@170buildsystems.com",
   telefono: "964 95 94 17",
-  gtmId: "", // p. ej. "GTM-XXXXXXX" (vacío = no se carga nada)
+  gtmId: "GTM-WRQTGQ9P", // contenedor "subcontrata.online" en la cuenta GTM reformapresupuesto.com (vacío = no se carga nada)
   adsConversion: "", // p. ej. "AW-18327428753/XXXXXXXXXXXX"
   anio: new Date().getFullYear(),
 };
