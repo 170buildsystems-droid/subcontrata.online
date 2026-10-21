@@ -52,11 +52,12 @@ Eventos enviados a `dataLayer` (GTM): `form_start`, `form_step2`, `form_submit` 
 
 Alternativa sin GitHub: `npx wrangler pages deploy dist --project-name subcontrata-online`.
 
-### Opción B — GitHub Pages
-1. Settings → Pages → Source: **GitHub Actions**. El workflow `.github/workflows/pages.yml` ya está.
-2. Settings → Pages → Custom domain: `subcontrata.online` (el fichero `CNAME` se genera en `dist/`). Activa «Enforce HTTPS».
-3. DNS: registros A del apex a las IP de GitHub Pages y CNAME `www` → `<usuario>.github.io`.
-   Nota: GitHub Pages no aplica `_headers` ni `_redirects`; las cabeceras de seguridad y el 301 de `www` hay que ponerlos delante (Cloudflare DNS proxy con una regla de redirección).
+### Opción B — GitHub Pages (la que está activa ahora)
+1. `npm run publicar` genera `dist/` y lo sube a la rama `gh-pages` (script `scripts/publicar-gh-pages.sh`). Settings → Pages apunta a esa rama.
+2. Settings → Pages → Custom domain: `subcontrata.online` (el fichero `CNAME` va en `dist/`). Activa «Enforce HTTPS» cuando el DNS resuelva.
+3. DNS: registros A del apex a 185.199.108.153, 185.199.109.153, 185.199.110.153 y 185.199.111.153, y CNAME `www` → `170buildsystems-droid.github.io`.
+   Nota: GitHub Pages no aplica `_headers` ni `_redirects`; las cabeceras de seguridad y el 301 de `www` hay que ponerlos delante (Cloudflare DNS proxy con una regla de redirección) o migrar a la opción A.
+   Si se prefiere GitHub Actions, el workflow está en `despliegue/github-pages-workflow.yml` (cópialo a `.github/workflows/`; requiere un token con permiso `workflow`).
 
 ## Antes de publicar
 - Rellena `nif` y `domicilio` en `src/data/sitio.mjs` (obligatorio por LSSI).

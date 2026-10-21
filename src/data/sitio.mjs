@@ -8,9 +8,9 @@ export const SITIO = {
   destinoNombre: "reformapresupuesto.com",
   titular: "170 Build&Systems",
   nombreComercial: "reformapresupuesto170",
-  nif: "[NIF DE 170 BUILD&SYSTEMS]",
-  domicilio: "[DOMICILIO SOCIAL COMPLETO]",
-  email: "hola@170buildsystems.com",
+  nif: "X2741455Q",
+  domicilio: "Calle Luis Vives, 7 — 12580 (Castellón)",
+  email: "legal@170buildsystems.com",
   telefono: "964 95 94 17",
   gtmId: "", // p. ej. "GTM-XXXXXXX" (vacío = no se carga nada)
   adsConversion: "", // p. ej. "AW-18327428753/XXXXXXXXXXXX"

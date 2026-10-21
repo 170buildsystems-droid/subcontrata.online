@@ -355,6 +355,7 @@ async function auxiliares() {
   await cp("public", DIST, { recursive: true });
   // CNAME para GitHub Pages (inofensivo en Cloudflare)
   await writeFile(join(DIST, "CNAME"), SITIO.dominio + "\n");
+  await writeFile(join(DIST, ".nojekyll"), "");
 
   // Entregable 2: palabras clave + título/descripción por página
   const md = [`# Palabras clave objetivo por página\n\nGenerado por \`node build.mjs\` (${hoy}). Título ≤ 60 y descripción ≤ 155 caracteres: se marca con ⚠ lo que se pasa.\n`];
