@@ -358,7 +358,7 @@ async function auxiliares() {
   await writeFile(join(DIST, "_redirects"), `https://www.${SITIO.dominio}/* ${SITIO.url}/:splat 301\n`);
   await cp("public", DIST, { recursive: true });
   // CNAME para GitHub Pages (inofensivo en Cloudflare)
-  await writeFile(join(DIST, "CNAME"), SITIO.dominio + "\n");
+  if (!BASE) await writeFile(join(DIST, "CNAME"), SITIO.dominio + "\n"); // con BASE_PATH es previsualización, sin dominio
   await writeFile(join(DIST, ".nojekyll"), "");
 
   // Entregable 2: palabras clave + título/descripción por página
