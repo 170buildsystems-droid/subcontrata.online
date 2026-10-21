@@ -1,0 +1,321 @@
+{
+ "exportFormatVersion": 2,
+ "containerVersion": {
+  "accountId": "6369701886",
+  "containerId": "268005057",
+  "container": {
+   "accountId": "6369701886",
+   "containerId": "268005057",
+   "name": "subcontrata.online",
+   "publicId": "GTM-WRQTGQ9P",
+   "usageContext": [
+    "WEB"
+   ]
+  },
+  "tag": [
+   {
+    "name": "GA4 - Configuración (Google tag)",
+    "type": "googtag",
+    "tagId": "1",
+    "parameter": [
+     {
+      "type": "TEMPLATE",
+      "key": "tagId",
+      "value": "G-W6NXYSHHPZ"
+     }
+    ],
+    "firingTriggerId": [
+     "2147479553"
+    ],
+    "tagFiringOption": "ONCE_PER_EVENT"
+   },
+   {
+    "name": "GA4 - Eventos de la landing",
+    "type": "gaawe",
+    "tagId": "2",
+    "parameter": [
+     {
+      "type": "TEMPLATE",
+      "key": "measurementIdOverride",
+      "value": "G-W6NXYSHHPZ"
+     },
+     {
+      "type": "TEMPLATE",
+      "key": "eventName",
+      "value": "{{Event}}"
+     },
+     {
+      "type": "LIST",
+      "key": "eventParameters",
+      "list": [
+       {
+        "type": "MAP",
+        "map": [
+         {
+          "type": "TEMPLATE",
+          "key": "name",
+          "value": "tipo"
+         },
+         {
+          "type": "TEMPLATE",
+          "key": "value",
+          "value": "{{DL - tipo}}"
+         }
+        ]
+       },
+       {
+        "type": "MAP",
+        "map": [
+         {
+          "type": "TEMPLATE",
+          "key": "name",
+          "value": "ciudad"
+         },
+         {
+          "type": "TEMPLATE",
+          "key": "value",
+          "value": "{{DL - ciudad}}"
+         }
+        ]
+       },
+       {
+        "type": "MAP",
+        "map": [
+         {
+          "type": "TEMPLATE",
+          "key": "name",
+          "value": "utm_campaign"
+         },
+         {
+          "type": "TEMPLATE",
+          "key": "value",
+          "value": "{{DL - utm_campaign}}"
+         }
+        ]
+       },
+       {
+        "type": "MAP",
+        "map": [
+         {
+          "type": "TEMPLATE",
+          "key": "name",
+          "value": "utm_content"
+         },
+         {
+          "type": "TEMPLATE",
+          "key": "value",
+          "value": "{{DL - utm_content}}"
+         }
+        ]
+       },
+       {
+        "type": "MAP",
+        "map": [
+         {
+          "type": "TEMPLATE",
+          "key": "name",
+          "value": "empresa"
+         },
+         {
+          "type": "TEMPLATE",
+          "key": "value",
+          "value": "{{DL - empresa}}"
+         }
+        ]
+       },
+       {
+        "type": "MAP",
+        "map": [
+         {
+          "type": "TEMPLATE",
+          "key": "name",
+          "value": "destino"
+         },
+         {
+          "type": "TEMPLATE",
+          "key": "value",
+          "value": "{{DL - destino}}"
+         }
+        ]
+       }
+      ]
+     }
+    ],
+    "firingTriggerId": [
+     "10"
+    ],
+    "tagFiringOption": "ONCE_PER_EVENT"
+   }
+  ],
+  "trigger": [
+   {
+    "name": "Eventos de la landing (dataLayer)",
+    "type": "CUSTOM_EVENT",
+    "triggerId": "10",
+    "customEventFilter": [
+     {
+      "type": "MATCH_REGEX",
+      "parameter": [
+       {
+        "type": "TEMPLATE",
+        "key": "arg0",
+        "value": "{{_event}}"
+       },
+       {
+        "type": "TEMPLATE",
+        "key": "arg1",
+        "value": "^(form_start|form_step2|form_submit|cta_click|consent_granted|consent_denied)$"
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "variable": [
+   {
+    "name": "DL - tipo",
+    "type": "v",
+    "parameter": [
+     {
+      "type": "INTEGER",
+      "key": "dataLayerVersion",
+      "value": "2"
+     },
+     {
+      "type": "BOOLEAN",
+      "key": "setDefaultValue",
+      "value": "false"
+     },
+     {
+      "type": "TEMPLATE",
+      "key": "name",
+      "value": "tipo"
+     }
+    ]
+   },
+   {
+    "name": "DL - ciudad",
+    "type": "v",
+    "parameter": [
+     {
+      "type": "INTEGER",
+      "key": "dataLayerVersion",
+      "value": "2"
+     },
+     {
+      "type": "BOOLEAN",
+      "key": "setDefaultValue",
+      "value": "false"
+     },
+     {
+      "type": "TEMPLATE",
+      "key": "name",
+      "value": "ciudad"
+     }
+    ]
+   },
+   {
+    "name": "DL - utm_campaign",
+    "type": "v",
+    "parameter": [
+     {
+      "type": "INTEGER",
+      "key": "dataLayerVersion",
+      "value": "2"
+     },
+     {
+      "type": "BOOLEAN",
+      "key": "setDefaultValue",
+      "value": "false"
+     },
+     {
+      "type": "TEMPLATE",
+      "key": "name",
+      "value": "utm_campaign"
+     }
+    ]
+   },
+   {
+    "name": "DL - utm_content",
+    "type": "v",
+    "parameter": [
+     {
+      "type": "INTEGER",
+      "key": "dataLayerVersion",
+      "value": "2"
+     },
+     {
+      "type": "BOOLEAN",
+      "key": "setDefaultValue",
+      "value": "false"
+     },
+     {
+      "type": "TEMPLATE",
+      "key": "name",
+      "value": "utm_content"
+     }
+    ]
+   },
+   {
+    "name": "DL - empresa",
+    "type": "v",
+    "parameter": [
+     {
+      "type": "INTEGER",
+      "key": "dataLayerVersion",
+      "value": "2"
+     },
+     {
+      "type": "BOOLEAN",
+      "key": "setDefaultValue",
+      "value": "false"
+     },
+     {
+      "type": "TEMPLATE",
+      "key": "name",
+      "value": "empresa"
+     }
+    ]
+   },
+   {
+    "name": "DL - destino",
+    "type": "v",
+    "parameter": [
+     {
+      "type": "INTEGER",
+      "key": "dataLayerVersion",
+      "value": "2"
+     },
+     {
+      "type": "BOOLEAN",
+      "key": "setDefaultValue",
+      "value": "false"
+     },
+     {
+      "type": "TEMPLATE",
+      "key": "name",
+      "value": "destino"
+     }
+    ]
+   }
+  ],
+  "builtInVariable": [
+   {
+    "type": "EVENT",
+    "name": "Event"
+   },
+   {
+    "type": "PAGE_URL",
+    "name": "Page URL"
+   },
+   {
+    "type": "PAGE_PATH",
+    "name": "Page Path"
+   },
+   {
+    "type": "REFERRER",
+    "name": "Referrer"
+   }
+  ]
+ }
+}
