@@ -97,30 +97,64 @@
       if (!ciudad.value.trim()) { mensajes.push("Indica la ciudad."); ciudad.setAttribute("aria-invalid", "true"); }
       if (!/^\d{5}$/.test(cp.value.trim())) { mensajes.push("El código postal son 5 cifras."); cp.setAttribute("aria-invalid", "true"); }
       if (mensajes.length) { error.textContent = mensajes.join(" "); error.hidden = false; return; }
+      var nombre = form.querySelector('input[name="nombre"]');
+      var telefono = form.querySelector('input[name="telefono"]');
+      var email = form.querySelector('input[name="email"]');
+      var privacidad = form.querySelector('input[name="privacidad"]');
+      nombre.setAttribute("aria-invalid", "false"); telefono.setAttribute("aria-invalid", "false"); email.setAttribute("aria-invalid", "false");
+      if (nombre.value.trim().length < 2) { mensajes.push("Indica tu nombre."); nombre.setAttribute("aria-invalid", "true"); }
+      if (!telefono.value.trim() && !email.value.trim()) { mensajes.push("Déjanos un teléfono o un email."); telefono.setAttribute("aria-invalid", "true"); email.setAttribute("aria-invalid", "true"); }
+      if (telefono.value.trim() && !/^[+\d][\d\s.-]{6,19}$/.test(telefono.value.trim())) { mensajes.push("El teléfono no es válido."); telefono.setAttribute("aria-invalid", "true"); }
+      if (email.value.trim() && !/^[^\s@]+@[^\s@.]+(\.[^\s@.]{2,})+$/.test(email.value.trim())) { mensajes.push("El email no es válido."); email.setAttribute("aria-invalid", "true"); }
+      if (!privacidad.checked) mensajes.push("Marca la casilla de privacidad para continuar.");
+      if (mensajes.length) { error.textContent = mensajes.join(" "); error.hidden = false; return; }
       error.hidden = true;
 
-      var p = new URLSearchParams();
-      p.set("tipo", tipoInput.value);
-      p.set("ciudad", ciudad.value.trim());
-      p.set("cp", cp.value.trim());
-      var urg = form.querySelector('select[name="urgencia"]'); if (urg && urg.value) p.set("urgencia", urg.value);
-      var m2 = form.querySelector('input[name="superficie"]'); if (m2 && m2.value) p.set("superficie", m2.value);
-      var cal = form.querySelector('select[name="calidad"]'); if (cal && cal.value) p.set("calidad", cal.value);
-      if (empresa && empresa.checked) p.set("perfil", "empresa");
-      p.set("utm_source", SC.dominio || location.hostname);
-      p.set("utm_medium", "landing");
-      p.set("utm_campaign", campaign);
-      p.set("utm_content", content + (empresa && empresa.checked ? "-empresa" : ""));
-      var ref = new URLSearchParams(location.search).get("utm_term") || new URLSearchParams(location.search).get("q");
-      if (ref) p.set("utm_term", ref);
-      var url = (SC.destino || "https://reformapresupuesto.com/solicitar") + "?" + p.toString();
+      var q = new URLSearchParams(location.search);
+      var urg = form.querySelector('select[name="urgencia"]');
+      var m2 = form.querySelector('input[name="superficie"]');
+      var cal = form.querySelector('select[name="calidad"]');
+      var desc = form.querySelector('textarea[name="descripcion"]');
+      var mkt = form.querySelector('input[name="marketing"]');
+      var trampa = form.querySelector('input[name="web"]');
+      var esEmpresa = !!(empresa && empresa.checked);
+      var carga = {
+        tipo: tipoInput.value,
+        ciudad: ciudad.value.trim(),
+        cp: cp.value.trim(),
+        urgencia: urg ? urg.value : "",
+        superficie: m2 && m2.value ? Number(m2.value) : null,
+        calidad: cal ? cal.value : "",
+        empresa: esEmpresa,
+        nombre: nombre.value.trim(),
+        telefono: telefono.value.trim(),
+        email: email.value.trim(),
+        descripcion: desc ? desc.value.trim() : "",
+        consentimiento_marketing: !!(mkt && mkt.checked),
+        pagina: campaign,
+        cta: content + (esEmpresa ? "-empresa" : ""),
+        keyword: q.get("utm_term") || q.get("q") || "",
+        web: trampa ? trampa.value : ""
+      };
 
-      var datos = { tipo: tipoInput.value, ciudad: ciudad.value.trim(), utm_campaign: campaign, utm_content: content, empresa: !!(empresa && empresa.checked) };
-      if (SC.ads) datos.send_to = SC.ads;
-      evento("form_submit", datos);
-      enviar.disabled = true; enviar.textContent = "Un momento…";
-      // Da 300 ms a GTM para disparar la conversión; después redirige pase lo que pase.
-      setTimeout(function () { location.href = url; }, 300);
+      enviar.disabled = true; var txtAntes = enviar.textContent; enviar.textContent = "Enviando…";
+      fetch(SC.api, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(carga) })
+        .then(function (r) { return r.json().catch(function () { return { ok: false, error: "Respuesta no válida" }; }).then(function (j) { j.status = r.status; return j; }); })
+        .then(function (j) {
+          if (!j.ok) throw new Error(j.error || "No se pudo enviar la solicitud.");
+          var datos = { tipo: carga.tipo, ciudad: carga.ciudad, utm_campaign: campaign, utm_content: carga.cta, empresa: esEmpresa, solicitud_id: j.id || "" };
+          if (SC.ads) datos.send_to = SC.ads;
+          evento("form_submit", datos);
+          var g = new URLSearchParams({ tipo: carga.tipo, ciudad: carga.ciudad });
+          // Da 300 ms a GTM para disparar la conversión antes de cambiar de página.
+          setTimeout(function () { location.href = "/gracias?" + g.toString(); }, 300);
+        })
+        .catch(function (e) {
+          evento("form_error", { mensaje: String(e && e.message || e), utm_campaign: campaign });
+          error.textContent = (e && e.message) || "No se pudo enviar. Inténtalo de nuevo o llama al " + "964 95 94 17" + ".";
+          error.hidden = false;
+          enviar.disabled = false; enviar.textContent = txtAntes;
+        });
     });
   });
 

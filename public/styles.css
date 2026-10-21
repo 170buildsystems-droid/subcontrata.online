@@ -139,3 +139,12 @@ code{background:var(--suave);padding:2px 6px;border-radius:4px}
   .form-card{padding:14px 12px 12px}
 }
 @media(max-width:419px){.marca{font-size:.92rem}.marca img{width:30px;height:30px}.btn-cab{font-size:.85rem;padding:0 10px}.cabecera-int{gap:10px}}
+/* formulario con contacto */
+textarea{font:inherit;min-height:var(--toque);padding:10px 12px;border:2px solid var(--borde);border-radius:10px;background:#fff;color:var(--texto);width:100%;resize:vertical}
+textarea:focus{outline:none;border-color:var(--accion);box-shadow:0 0 0 3px var(--accion-suave)}
+.check{align-items:flex-start;font-size:.9rem;line-height:1.4;margin-bottom:8px}
+.check input{margin-top:2px}
+.trampa{position:absolute;left:-9999px;top:-9999px;height:0;overflow:hidden}
+.gracias{text-align:center;margin:0 auto;max-width:60ch}
+.gracias .lista{text-align:left;display:inline-block}
+.tick-grande{width:72px;height:72px;border-radius:50%;background:var(--accion);color:#fff;font-size:2.2rem;font-weight:800;display:flex;align-items:center;justify-content:center;margin:12px auto 8px}

@@ -1,6 +1,6 @@
 # subcontrata.online
 
-Landing estática de captación. Un solo objetivo: convertir visitas en solicitudes que se envían a **reformapresupuesto.com/solicitar** con los datos ya rellenos y atribución `utm_*`. No guarda datos personales, no tiene base de datos ni cuentas.
+Landing estática de captación. Un solo objetivo: convertir visitas en solicitudes. El formulario completo (qué, dónde, contacto) se envía por API a **reformapresupuesto.com/api/public/leads/subcontrata** y el visitante termina en `/gracias` **sin salir de subcontrata.online**. Esta web no tiene base de datos ni cuentas; la solicitud se registra en la plataforma del grupo con `sitio=subcontrata.online`.
 
 ## Estructura
 
@@ -30,16 +30,9 @@ npm run dev      # build + servidor local en http://localhost:4321
 
 ## Cómo llega la solicitud a reformapresupuesto.com
 
-El formulario (dos pasos: qué y dónde) construye en el navegador esta URL y redirige:
+`public/app.js` valida el formulario y hace `POST` JSON a `SITIO.api` (`https://reformapresupuesto.com/api/public/leads/subcontrata`), con CORS limitado a subcontrata.online y localhost, campo trampa `web` contra robots y límite por IP en el servidor. Campos: `tipo, ciudad, cp, urgencia, superficie, calidad, empresa, nombre, apellidos, telefono, email, descripcion, consentimiento_marketing, pagina (utm_campaign), cta (utm_content), keyword (utm_term)`. En la plataforma la fila entra en `client_requests` con `sitio=subcontrata.online` y `source=/solicitar?...utm_source=subcontrata.online...`, se avisa a los profesionales de la provincia y se envía el acuse al cliente. Si la API responde error, el formulario lo muestra y no se pierde nada escrito.
 
-```
-https://reformapresupuesto.com/solicitar?tipo=Baño&ciudad=Madrid&cp=28001&urgencia=Este%20mes&superficie=6&calidad=Media
-  &utm_source=subcontrata.online&utm_medium=landing&utm_campaign=<página>&utm_content=<botón>&utm_term=<palabra clave si venía en la URL>
-```
-
-Todos los botones de texto («Publicar mi obra gratis», etc.) llevan la misma atribución. `utm_campaign` vale `portada`, `subcontratar`, `presupuesto`, `ciudad`, `como-funciona`, `faq` o `404`; `utm_content` identifica el botón o formulario concreto (`form-albanileria`, `cta-final`, `fija-movil`…).
-
-Eventos enviados a `dataLayer` (GTM): `form_start`, `form_step2`, `form_submit` (con `send_to` para la conversión de Ads si está configurado), `cta_click`, `consent_granted` / `consent_denied`.
+Eventos enviados a `dataLayer` (GTM): `form_start`, `form_step2`, `form_submit` (solo tras respuesta OK de la API; con `send_to` para la conversión de Ads si está configurado), `form_error`, `cta_click`, `consent_granted` / `consent_denied`.
 
 ## Desplegar gratis
 

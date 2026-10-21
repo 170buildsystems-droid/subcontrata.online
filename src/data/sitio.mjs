@@ -4,7 +4,8 @@ export const SITIO = {
   url: "https://subcontrata.online",
   nombre: "Subcontrata.online",
   lema: "Publica tu obra. Profesionales verificados te llaman con presupuesto en 48 horas. Gratis.",
-  destino: "https://reformapresupuesto.com/solicitar",
+  // La solicitud se envía por API a la plataforma del grupo; el visitante no sale de esta web.
+  api: "https://reformapresupuesto.com/api/public/leads/subcontrata",
   destinoNombre: "reformapresupuesto.com",
   titular: "170 Build&Systems",
   nombreComercial: "reformapresupuesto170",
@@ -22,10 +23,10 @@ export const TIPOS = [
   "Albañilería", "Carpintería", "Suelos", "Ventanas", "Pladur", "Climatización",
 ];
 
-// Valores exactos que admite reformapresupuesto.com/solicitar (URGENCIES y QUALITY_LEVELS).
+// Valores que entiende la API de leads de reformapresupuesto.com (validarLeadExterno).
 export const URGENCIAS = [
-  { v: "Urgente (menos de 2 semanas)", t: "Cuanto antes (menos de 2 semanas)" },
-  { v: "Este mes", t: "Este mes" },
-  { v: "Flexible", t: "Sin prisa, estoy comparando" },
+  { v: "esta semana", t: "Cuanto antes (menos de 2 semanas)" },
+  { v: "este mes", t: "Este mes" },
+  { v: "sin prisa", t: "Sin prisa, estoy comparando" },
 ];
-export const CALIDADES = ["Básica", "Media", "Alta"];
+export const CALIDADES = ["básica", "media", "alta"];

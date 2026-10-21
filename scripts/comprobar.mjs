@@ -31,10 +31,9 @@ for (const f of ficheros) {
   if (desc.length > 155) avisos.push(`${rel}: descripción ${desc.length} car.`);
   if (!/rel="canonical"/.test(src)) errores.push(`${rel}: sin canonical`);
   for (const m of src.matchAll(/<img\b[^>]*>/g)) if (!/\balt=/.test(m[0])) errores.push(`${rel}: img sin alt`);
-  for (const m of src.matchAll(/href="(https?:\/\/reformapresupuesto\.com\/solicitar[^"]*)"/g)) {
-    const u = m[1].replace(/&amp;/g, "&");
-    for (const k of ["utm_source=", "utm_medium=landing", "utm_campaign=", "utm_content="]) if (!u.includes(k)) errores.push(`${rel}: CTA sin ${k}`);
-  }
+  // El visitante no sale de la web: ningún CTA puede llevar a /solicitar de la plataforma.
+  if (/href="https?:\/\/[^"]*\/solicitar/.test(src)) errores.push(`${rel}: enlace a /solicitar externo`);
+  if (/data-cta/.test(src) && !/id="solicitar"/.test(src) && !/href="\/#solicitar"/.test(src)) errores.push(`${rel}: CTA sin formulario ni enlace a /#solicitar`);
   for (const m of src.matchAll(/href="(\/[^"#?]*)/g)) {
     const h = BASE && m[1].startsWith(BASE + "/") ? m[1].slice(BASE.length) : m[1];
     const cands = h.endsWith("/") ? [join(DIST, h, "index.html")] : [join(DIST, h + ".html"), join(DIST, h), join(DIST, h, "index.html")];

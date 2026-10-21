@@ -14,17 +14,10 @@ const esc = (s = "") => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").r
 const paginas = []; // { ruta, titulo, descripcion, prioridad, claves }
 
 // URL de CTA con atribución completa (formato obligatorio del brief)
-function urlCta({ tipo = "", ciudad = "", cp = "", campaign, content, term = "" }) {
-  const p = new URLSearchParams();
-  if (tipo) p.set("tipo", tipo);
-  if (ciudad) p.set("ciudad", ciudad);
-  if (cp) p.set("cp", cp);
-  p.set("utm_source", SITIO.dominio);
-  p.set("utm_medium", "landing");
-  p.set("utm_campaign", campaign);
-  p.set("utm_content", content);
-  if (term) p.set("utm_term", term);
-  return `${SITIO.destino}?${p.toString()}`;
+// Todos los botones llevan al formulario de la propia página (o al de la
+// portada si la página no tiene). El visitante nunca sale de la web.
+function urlCta({ enPagina = true } = {}) {
+  return enPagina ? "#solicitar" : "/#solicitar";
 }
 
 const boton = (texto, href, content, extra = "") =>
@@ -58,12 +51,24 @@ function formulario({ tipo = "", ciudad = "", cp = "", campaign, content = "form
         <label>m² aproximados <span class="opc">(opcional)</span><input name="superficie" type="number" min="1" max="5000" inputmode="numeric" placeholder="80"></label>
       </div>
       <div class="fila">
-        <label>Calidad <span class="opc">(opcional)</span><select name="calidad"><option value="">Sin definir</option>${CALIDADES.map((c) => `<option value="${esc(c)}">${esc(c)}</option>`).join("")}</select></label>
+        <label>Calidad <span class="opc">(opcional)</span><select name="calidad"><option value="">Sin definir</option>${CALIDADES.map((c) => `<option value="${esc(c)}">${esc(c[0].toUpperCase() + c.slice(1))}</option>`).join("")}</select></label>
         <label class="check"><input type="checkbox" name="empresa"> Soy empresa o autónomo y necesito subcontratar</label>
       </div>
-      <p class="aviso-legal-form">Al continuar serás llevado a ${esc(SITIO.destinoNombre)}, donde completarás tu solicitud. Responsable del tratamiento: ${esc(SITIO.titular)}. Más información en la <a href="/privacidad">política de privacidad</a>.</p>
+      <p class="paso-titulo"><span class="num">${tipo ? "2" : "3"}</span> ¿Cómo te contactan?</p>
+      <div class="fila">
+        <label>Nombre<input name="nombre" type="text" autocomplete="name" required maxlength="60" placeholder="Tu nombre"></label>
+        <label>Teléfono<input name="telefono" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="600 000 000"></label>
+      </div>
+      <div class="fila">
+        <label>Email <span class="opc">(si no das teléfono)</span><input name="email" type="email" autocomplete="email" maxlength="255" placeholder="tu@email.com"></label>
+        <label>Describe el trabajo <span class="opc">(opcional)</span><textarea name="descripcion" rows="2" maxlength="4000" placeholder="Ej.: reforma de baño de 5 m², cambio de bañera por ducha"></textarea></label>
+      </div>
+      <label class="check"><input type="checkbox" name="privacidad" required> He leído la <a href="/privacidad">política de privacidad</a> y acepto que ${esc(SITIO.titular)} trate mis datos para gestionar mi solicitud y que los profesionales de la red me contacten.</label>
+      <label class="check"><input type="checkbox" name="marketing"> Quiero recibir consejos y novedades por email (opcional).</label>
+      <p class="trampa" aria-hidden="true"><label>Web<input name="web" type="text" tabindex="-1" autocomplete="off"></label></p>
+      <p class="aviso-legal-form">Responsable del tratamiento: ${esc(SITIO.titular)}. Tu solicitud se gestiona en ${esc(SITIO.destinoNombre)}, plataforma del mismo titular. Solo los profesionales que decidan contactarte ven tu teléfono o email.</p>
       <p class="error" data-error hidden role="alert"></p>
-      <button type="submit" class="btn btn-accion btn-grande" data-txt-particular="Ver presupuestos gratis →" data-txt-empresa="Pedir cuadrilla →">Ver presupuestos gratis →</button>
+      <button type="submit" class="btn btn-accion btn-grande" data-txt-particular="Recibir presupuestos gratis →" data-txt-empresa="Pedir cuadrilla →">Recibir presupuestos gratis →</button>
       <p class="sin-tarjeta">Sin tarjeta. Sin compromiso. Los profesionales pagan la plataforma, tú no.</p>
     </div>
   </form>
@@ -91,6 +96,8 @@ function pagina({ ruta, titulo, descripcion, cuerpo, jsonld = [], noindex = fals
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s);j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${SITIO.gtmId}');</script>`
     : `<script>window.dataLayer=window.dataLayer||[];</script>`;
   if (!noindex) paginas.push({ ruta, titulo, descripcion, prioridad, claves });
+  // Si la página no lleva formulario, los botones llevan al de la portada.
+  const ancla = cuerpo.includes('id="solicitar"') ? "#solicitar" : "/#solicitar";
   return `<!doctype html>
 <html lang="es">
 <head>
@@ -111,7 +118,7 @@ ${noindex ? '<meta name="robots" content="noindex, nofollow">' : '<meta name="ro
 <meta name="theme-color" content="#0f172a">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/styles.css">
-<script>window.SC={ads:${JSON.stringify(SITIO.adsConversion)},destino:${JSON.stringify(SITIO.destino)},dominio:${JSON.stringify(SITIO.dominio)}};</script>
+<script>window.SC={ads:${JSON.stringify(SITIO.adsConversion)},api:${JSON.stringify(SITIO.api)},dominio:${JSON.stringify(SITIO.dominio)}};</script>
 ${gtm}
 ${ld.map((o) => `<script type="application/ld+json">${JSON.stringify(o)}</script>`).join("\n")}
 </head>
@@ -126,7 +133,7 @@ ${SITIO.gtmId ? `<noscript><iframe src="https://www.googletagmanager.com/ns.html
       <a href="/presupuesto/">Presupuestos</a>
       <a href="/como-funciona">Cómo funciona</a>
     </nav>
-    <a class="btn btn-accion btn-cab" href="#solicitar" data-cta="cabecera">Presupuesto gratis</a>
+    <a class="btn btn-accion btn-cab" href="${ancla}" data-cta="cabecera">Presupuesto gratis</a>
   </div>
 </header>
 <main id="contenido">
@@ -144,7 +151,7 @@ ${cuerpo}
   </div>
   <p class="contenedor pie-copy">© ${SITIO.anio} ${esc(SITIO.titular)} (${esc(SITIO.nombreComercial)}). Plazos habituales, no garantizados. Los precios orientativos no constituyen oferta.</p>
 </footer>
-<a class="btn btn-accion cta-fija" href="#solicitar" data-cta="fija-movil">Ver presupuestos gratis →</a>
+${ruta === "/gracias" ? "" : `<a class="btn btn-accion cta-fija" href="${ancla}" data-cta="fija-movil">Ver presupuestos gratis →</a>`}
 <div class="cookies" data-cookies hidden role="dialog" aria-labelledby="ck-t" aria-live="polite">
   <p id="ck-t"><strong>Cookies.</strong> Solo usamos cookies de medición (Google Analytics) si las aceptas. Sin ellas la web funciona igual. <a href="/cookies">Más información</a></p>
   <div class="cookies-btns"><button type="button" class="btn btn-sec" data-ck="denied">Rechazar</button><button type="button" class="btn btn-accion" data-ck="granted">Aceptar</button></div>
@@ -177,7 +184,7 @@ const ctaFinal = (campaign, tipo = "", ciudad = "", cp = "") => `
 <section class="bloque cta-final">
   <h2>¿Empezamos?</h2>
   <p>Describe el trabajo en dos minutos. Profesionales verificados te llaman con presupuesto, habitualmente en 48 horas.</p>
-  ${boton("Publicar mi obra gratis", urlCta({ tipo, ciudad, cp, campaign, content: "cta-final" }), "cta-final", "btn-grande")}
+  ${boton("Publicar mi obra gratis", urlCta(), "cta-final", "btn-grande")}
 </section>`;
 const enlacesGremios = (excluir = "") => `<section class="bloque"><h2>Otros gremios que puedes subcontratar</h2><p class="chips">${GREMIOS.filter((g) => g.slug !== excluir).map((g) => `<a href="/subcontratar/${g.slug}">${esc(g.nombre)}</a>`).join("")}</p></section>`;
 const enlacesCiudades = (excluir = "") => `<section class="bloque"><h2>Subcontratar por ciudad</h2><p class="chips">${CIUDADES.filter((c) => c.slug !== excluir).map((c) => `<a href="/subcontratar-en/${c.slug}">${esc(c.nombre)}</a>`).join("")}</p></section>`;
@@ -308,7 +315,7 @@ async function estaticas() {
   const simple = (ruta, titulo, descripcion, h1, html, extra = {}) => escribir(ruta, pagina({ ruta, titulo, descripcion, cuerpo: `<div class="contenedor"><article class="bloque texto"><h1>${esc(h1)}</h1>${html}</article></div>`, ...extra }));
 
   await escribir("/como-funciona", pagina({ ruta: "/como-funciona", titulo: "Cómo funciona: publicas, te llaman, comparas", descripcion: "Describes el trabajo en dos pasos, terminas la solicitud en reformapresupuesto.com y profesionales verificados te llaman con presupuesto en 48 h.", cuerpo: `<div class="contenedor"><section class="bloque"><h1>Cómo funciona</h1><p class="sub">Tres pasos. Nada de registros ni tarjetas para pedir.</p></section>${comoFunciona()}
-<section class="bloque texto"><h2>Qué pasa con tu solicitud</h2><p>Aquí solo indicas qué necesitas y dónde. Al pulsar el botón te llevamos a ${esc(SITIO.destinoNombre)} con esos datos ya rellenos; allí añades una descripción, tu nombre y un teléfono, y publicas. Los profesionales de tu provincia ven la solicitud y los que decidan contactarte te llaman. Solo ellos ven tus datos.</p>
+<section class="bloque texto"><h2>Qué pasa con tu solicitud</h2><p>Indicas qué necesitas, dónde y cómo contactarte, y pulsas el botón. La solicitud entra al instante en ${esc(SITIO.destinoNombre)}, la plataforma del grupo donde están dados de alta los profesionales. Los de tu provincia la ven y los que decidan contactarte te llaman. Solo ellos ven tu teléfono o email.</p>
 <h2>Qué significa «verificado»</h2><p>Un profesional verificado en ${esc(SITIO.destinoNombre)} ha acreditado NIF, nombre real, nombre comercial, teléfono y email, y mantiene una suscripción activa. Lo verás señalado en su perfil. Aun así, pide siempre por escrito seguro de responsabilidad civil y alta de trabajadores antes de empezar.</p>
 <h2>Cuánto tarda</h2><p>Habitualmente, 48 horas. No es un plazo garantizado: depende de que haya profesionales con capacidad en tu zona y del tipo de trabajo.</p>
 <h2>Qué cuesta</h2><p>A quien pide, nada. Ni al publicar, ni al recibir llamadas, ni al contratar. Los profesionales pagan la plataforma por acceder a los contactos. Esa es la única fuente de ingresos y por eso no hay comisión sobre tu obra.</p></section>
@@ -324,7 +331,7 @@ ${pruebas()}${formulario({ campaign: "como-funciona", content: "form-como-funcio
 
   await simple("/aviso-legal", "Aviso legal | subcontrata.online", "Datos identificativos del titular de subcontrata.online conforme a la LSSI: 170 Build&Systems, condiciones de uso y propiedad intelectual.", "Aviso legal", `
 <h2>Titular</h2><p>En cumplimiento del artículo 10 de la Ley 34/2002, de servicios de la sociedad de la información y de comercio electrónico (LSSI), se informa de que el titular de este sitio web es <strong>${esc(SITIO.titular)}</strong>, con nombre comercial ${esc(SITIO.nombreComercial)}, NIF ${esc(SITIO.nif)}, domicilio en ${esc(SITIO.domicilio)}, correo electrónico ${esc(SITIO.email)} y teléfono ${esc(SITIO.telefono)}.</p>
-<h2>Objeto</h2><p>${esc(SITIO.dominio)} es una página de captación: permite describir una necesidad de obra o reforma y redirige al usuario a ${esc(SITIO.destinoNombre)}, plataforma del mismo titular, donde se completa y publica la solicitud. Este sitio no presta servicios de reforma ni interviene en la contratación entre usuarios y profesionales.</p>
+<h2>Objeto</h2><p>${esc(SITIO.dominio)} permite describir una necesidad de obra o reforma y solicitar presupuestos. La solicitud se registra en ${esc(SITIO.destinoNombre)}, plataforma del mismo titular, desde la que los profesionales dados de alta contactan con el solicitante. Este sitio no presta servicios de reforma ni interviene en la contratación entre usuarios y profesionales.</p>
 <h2>Condiciones de uso</h2><p>El uso es gratuito para quien solicita presupuesto. Los plazos indicados («habitualmente 48 horas») son estimaciones y no constituyen garantía. Los rangos de precio publicados son orientativos, proceden de la experiencia del sector y no constituyen oferta contractual; el precio real lo fija cada presupuesto que reciba el usuario.</p>
 <h2>Propiedad intelectual</h2><p>Los textos, el diseño y el código de este sitio son titularidad de ${esc(SITIO.titular)}. Queda prohibida su reproducción sin autorización, salvo para citas con mención de la fuente.</p>
 <h2>Responsabilidad</h2><p>El titular no responde del contenido de sitios de terceros enlazados ni de los presupuestos, trabajos o relaciones contractuales entre usuarios y profesionales, que se rigen por las condiciones de ${esc(SITIO.destinoNombre)}.</p>
@@ -332,10 +339,12 @@ ${pruebas()}${formulario({ campaign: "como-funciona", content: "form-como-funcio
 
   await simple("/privacidad", "Política de privacidad | subcontrata.online", "Esta web no almacena datos personales: te redirige a reformapresupuesto.com con tu solicitud empezada. Responsable: 170 Build&Systems.", "Política de privacidad", `
 <h2>Responsable</h2><p>${esc(SITIO.titular)} (${esc(SITIO.nombreComercial)}), NIF ${esc(SITIO.nif)}, ${esc(SITIO.domicilio)}, ${esc(SITIO.email)}.</p>
-<h2>Qué datos trata este sitio</h2><p><strong>Ninguno de carácter identificativo.</strong> El formulario de esta web recoge únicamente el tipo de trabajo, la ciudad, el código postal, la urgencia, los metros y la calidad deseada, y los transmite en la dirección de destino al redirigirte a ${esc(SITIO.destinoNombre)}. No se guardan en ningún servidor de ${esc(SITIO.dominio)}. Tu nombre, teléfono y correo se piden en ${esc(SITIO.destinoNombre)}, bajo su propia <a href="https://${esc(SITIO.destinoNombre)}/privacidad" rel="noopener">política de privacidad</a> y con tu consentimiento expreso allí.</p>
+<h2>Qué datos trata este sitio y para qué</h2><p>El formulario recoge el tipo de trabajo, la ciudad, el código postal, la urgencia, los metros y la calidad deseada, una descripción opcional y tus datos de contacto: nombre y teléfono o email. Se envían de forma cifrada a ${esc(SITIO.destinoNombre)}, plataforma del mismo responsable, donde se registra la solicitud. Finalidad: gestionar tu petición de presupuesto y ponerla a disposición de los profesionales dados de alta en tu provincia para que te contacten. Base jurídica: la ejecución de la relación precontractual que solicitas (art. 6.1.b RGPD) y, para el envío de consejos y novedades, tu consentimiento (art. 6.1.a), solo si marcas la casilla.</p>
+<h2>Quién ve tus datos</h2><p>Los profesionales de la red que decidan contactarte ven tu nombre, teléfono y email, y la descripción del trabajo. Están obligados a usarlos solo para presupuestar tu obra. No se venden ni se ceden a terceros ajenos a la red. Si no se acepta la solicitud (robots, duplicados), no se conserva.</p>
+<h2>Conservación</h2><p>Mientras la solicitud esté activa y, después, el plazo necesario para atender reclamaciones y obligaciones legales. Puedes pedir la supresión en cualquier momento.</p>
 <h2>Medición</h2><p>Solo si aceptas las cookies de medición, se cargan Google Analytics 4 y Google Tag Manager, que tratan identificadores de dispositivo y datos de navegación de forma seudonimizada para medir el uso del sitio y la eficacia de la publicidad. Base jurídica: tu consentimiento (art. 6.1.a RGPD), que puedes retirar en cualquier momento desde «Configurar cookies» en el pie de página. Sin consentimiento no se cargan estas herramientas.</p>
 <h2>Destinatarios</h2><p>Google Ireland Ltd. como encargado de tratamiento de las herramientas de medición, con las garantías del marco de transferencias UE–EE. UU. No se ceden datos a terceros con fines propios.</p>
-<h2>Conservación</h2><p>Este sitio no conserva datos. Los datos de medición se conservan el plazo configurado en Google Analytics (máximo 14 meses).</p>
+<h2>Medición: conservación</h2><p>Los datos de medición se conservan el plazo configurado en Google Analytics (máximo 14 meses).</p>
 <h2>Derechos</h2><p>Acceso, rectificación, supresión, oposición, limitación y portabilidad escribiendo a ${esc(SITIO.email)} con copia de un documento identificativo. Puedes reclamar ante la Agencia Española de Protección de Datos (aepd.es).</p>
 <h2>Menores</h2><p>El sitio no se dirige a menores de 14 años.</p>`, { prioridad: "0.2", claves: ["política de privacidad"] });
 
@@ -346,7 +355,13 @@ ${pruebas()}${formulario({ campaign: "como-funciona", content: "form-como-funcio
 <h2>Cómo cambiar tu elección</h2><p>Pulsa «Configurar cookies» en el pie de cualquier página, o borra los datos del sitio desde tu navegador. También puedes bloquear cookies de terceros en la configuración del navegador.</p>
 <h2>Más información</h2><p>Consulta la <a href="/privacidad">política de privacidad</a> y la <a href="https://policies.google.com/technologies/cookies?hl=es" rel="noopener">política de cookies de Google</a>.</p>`, { prioridad: "0.2", claves: ["política de cookies"] });
 
-  await writeFile(join(DIST, "404.html"), pagina({ ruta: "/404", titulo: "Página no encontrada | subcontrata.online", descripcion: "Esta página no existe.", noindex: true, cuerpo: `<div class="contenedor"><section class="bloque texto"><h1>Página no encontrada</h1><p>La dirección no existe o ha cambiado. Puedes <a href="/">volver al inicio</a> o publicar tu obra directamente.</p>${boton("Publicar mi obra gratis", urlCta({ campaign: "404", content: "404" }), "404")}</section></div>` }));
+  await escribir("/gracias", pagina({ ruta: "/gracias", titulo: "Solicitud recibida | subcontrata.online", descripcion: "Tu solicitud se ha registrado. Profesionales verificados de tu provincia te llamarán, habitualmente en 48 horas.", noindex: true, cuerpo: `<div class="contenedor"><section class="bloque texto gracias"><p class="tick-grande" aria-hidden="true">✓</p><h1>Solicitud recibida</h1>
+<p class="sub">Ya está publicada para los profesionales de tu provincia. Los que decidan contactarte te llamarán o escribirán, habitualmente en 48 horas.</p>
+<h2>Qué pasa ahora</h2><ol class="lista"><li>Los profesionales ven el trabajo (no tus datos) y deciden si pueden hacerlo.</li><li>Hasta cuatro de ellos te contactan con presupuesto o para concertar visita.</li><li>Comparas con calma y eliges, o no eliges a nadie. No hay compromiso.</li></ol>
+<h2>Mientras tanto</h2><p>Ten a mano fotos o un croquis de la obra: acortan mucho la primera llamada. Si es una obra de empresa, prepara el alcance por escrito y las fechas de entrada.</p>
+<p><a class="btn btn-sec" href="/">Volver al inicio</a></p></section></div>` }));
+
+  await writeFile(join(DIST, "404.html"), pagina({ ruta: "/404", titulo: "Página no encontrada | subcontrata.online", descripcion: "Esta página no existe.", noindex: true, cuerpo: `<div class="contenedor"><section class="bloque texto"><h1>Página no encontrada</h1><p>La dirección no existe o ha cambiado. Puedes <a href="/">volver al inicio</a> o publicar tu obra directamente.</p>${boton("Publicar mi obra gratis", urlCta({ enPagina: false }), "404")}</section></div>` }));
 }
 
 // ---------- Ficheros auxiliares ----------
@@ -355,7 +370,7 @@ async function auxiliares() {
   await writeFile(join(DIST, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${paginas.map((p) => `  <url><loc>${SITIO.url}${p.ruta === "/" ? "/" : p.ruta}</loc><lastmod>${hoy}</lastmod><priority>${p.prioridad}</priority></url>`).join("\n")}\n</urlset>\n`);
   await writeFile(join(DIST, "robots.txt"), `User-agent: *\nAllow: /\nDisallow: /404.html\n\nSitemap: ${SITIO.url}/sitemap.xml\n`);
   // Cloudflare Pages: cabeceras de seguridad y redirecciones
-  await writeFile(join(DIST, "_headers"), `/*\n  X-Frame-Options: DENY\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n  Permissions-Policy: camera=(), microphone=(), geolocation=()\n  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload\n  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net; img-src 'self' data: https://www.googletagmanager.com https://www.google-analytics.com https://www.facebook.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com https://www.facebook.com; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://${SITIO.destinoNombre}\n\n/styles.css\n  Cache-Control: public, max-age=86400\n/app.js\n  Cache-Control: public, max-age=86400\n/logo.svg\n  Cache-Control: public, max-age=604800\n`);
+  await writeFile(join(DIST, "_headers"), `/*\n  X-Frame-Options: DENY\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n  Permissions-Policy: camera=(), microphone=(), geolocation=()\n  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload\n  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net; img-src 'self' data: https://www.googletagmanager.com https://www.google-analytics.com https://www.facebook.com; connect-src 'self' https://${SITIO.destinoNombre} https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com https://www.facebook.com; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'\n\n/styles.css\n  Cache-Control: public, max-age=86400\n/app.js\n  Cache-Control: public, max-age=86400\n/logo.svg\n  Cache-Control: public, max-age=604800\n`);
   await writeFile(join(DIST, "_redirects"), `https://www.${SITIO.dominio}/* ${SITIO.url}/:splat 301\n`);
   await cp("public", DIST, { recursive: true });
   // CNAME para GitHub Pages (inofensivo en Cloudflare)
