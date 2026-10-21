@@ -8,6 +8,8 @@ import { CIUDADES } from "./src/data/ciudades.mjs";
 import { FAQS } from "./src/data/faqs.mjs";
 
 const DIST = "dist";
+// BASE_PATH=/repo para previsualizar en usuario.github.io/repo; vacío en producción.
+const BASE = (process.env.BASE_PATH || "").replace(/\/$/, "");
 const esc = (s = "") => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const paginas = []; // { ruta, titulo, descripcion, prioridad, claves }
 
@@ -180,9 +182,11 @@ const enlacesGremios = (excluir = "") => `<section class="bloque"><h2>Otros grem
 const enlacesCiudades = (excluir = "") => `<section class="bloque"><h2>Subcontratar por ciudad</h2><p class="chips">${CIUDADES.filter((c) => c.slug !== excluir).map((c) => `<a href="/subcontratar-en/${c.slug}">${esc(c.nombre)}</a>`).join("")}</p></section>`;
 
 async function escribir(ruta, html) {
+  // eslint-disable-next-line no-param-reassign
   const fichero = ruta === "/" ? "index.html" : ruta.endsWith("/") ? ruta.slice(1) + "index.html" : ruta.slice(1) + ".html";
   const destino = join(DIST, fichero);
   await mkdir(dirname(destino), { recursive: true });
+  if (BASE) html = html.replace(/(href|src)="\/(?!\/)/g, `$1="${BASE}/`);
   await writeFile(destino, html);
 }
 
