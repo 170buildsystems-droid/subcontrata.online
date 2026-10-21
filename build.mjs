@@ -8,6 +8,7 @@ import { CIUDADES } from "./src/data/ciudades.mjs";
 import { FAQS } from "./src/data/faqs.mjs";
 
 const DIST = "dist";
+const VERSION = Date.now().toString(36); // cambia en cada build: evita CSS/JS cacheados
 // BASE_PATH=/repo para previsualizar en usuario.github.io/repo; vacío en producción.
 const BASE = (process.env.BASE_PATH || "").replace(/\/$/, "");
 const esc = (s = "") => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -52,7 +53,7 @@ function formulario({ tipo = "", ciudad = "", cp = "", campaign, content = "form
       </div>
       <div class="fila">
         <label>Calidad <span class="opc">(opcional)</span><select name="calidad"><option value="">Sin definir</option>${CALIDADES.map((c) => `<option value="${esc(c)}">${esc(c[0].toUpperCase() + c.slice(1))}</option>`).join("")}</select></label>
-        <label class="check"><input type="checkbox" name="empresa"> Soy empresa o autónomo y necesito subcontratar</label>
+        <label class="check"><input type="checkbox" name="empresa"><span>Soy empresa o autónomo y necesito subcontratar</span></label>
       </div>
       <p class="paso-titulo"><span class="num">${tipo ? "2" : "3"}</span> ¿Cómo te contactan?</p>
       <div class="fila">
@@ -63,9 +64,9 @@ function formulario({ tipo = "", ciudad = "", cp = "", campaign, content = "form
         <label>Email <span class="opc">(si no das teléfono)</span><input name="email" type="email" autocomplete="email" maxlength="255" placeholder="tu@email.com"></label>
         <label>Describe el trabajo <span class="opc">(opcional)</span><textarea name="descripcion" rows="2" maxlength="4000" placeholder="Ej.: reforma de baño de 5 m², cambio de bañera por ducha"></textarea></label>
       </div>
-      <label class="check"><input type="checkbox" name="privacidad" required> He leído la <a href="/privacidad">política de privacidad</a> y acepto que ${esc(SITIO.titular)} trate mis datos para gestionar mi solicitud y que los profesionales de la red me contacten.</label>
-      <label class="check"><input type="checkbox" name="marketing"> Quiero recibir consejos y novedades por email (opcional).</label>
-      <p class="trampa" aria-hidden="true"><label>Web<input name="web" type="text" tabindex="-1" autocomplete="off"></label></p>
+      <label class="check"><input type="checkbox" name="privacidad" required><span>He leído la <a href="/privacidad">política de privacidad</a> y acepto que ${esc(SITIO.titular)} trate mis datos para gestionar mi solicitud y que los profesionales de la red me contacten.</span></label>
+      <label class="check"><input type="checkbox" name="marketing"><span>Quiero recibir consejos y novedades por email (opcional).</span></label>
+      <div class="trampa" aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;height:0;overflow:hidden"><label>Web<input name="web" type="text" tabindex="-1" autocomplete="off"></label></div>
       <p class="aviso-legal-form">Responsable del tratamiento: ${esc(SITIO.titular)}. Tu solicitud se gestiona en ${esc(SITIO.destinoNombre)}, plataforma del mismo titular. Solo los profesionales que decidan contactarte ven tu teléfono o email.</p>
       <p class="error" data-error hidden role="alert"></p>
       <button type="submit" class="btn btn-accion btn-grande" data-txt-particular="Recibir presupuestos gratis →" data-txt-empresa="Pedir cuadrilla →">Recibir presupuestos gratis →</button>
@@ -117,7 +118,7 @@ ${noindex ? '<meta name="robots" content="noindex, nofollow">' : '<meta name="ro
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#0f172a">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/styles.css?v=${VERSION}">
 <script>window.SC={ads:${JSON.stringify(SITIO.adsConversion)},api:${JSON.stringify(SITIO.api)},dominio:${JSON.stringify(SITIO.dominio)}};</script>
 ${gtm}
 ${ld.map((o) => `<script type="application/ld+json">${JSON.stringify(o)}</script>`).join("\n")}
@@ -156,7 +157,7 @@ ${ruta === "/gracias" ? "" : `<a class="btn btn-accion cta-fija" href="${ancla}"
   <p id="ck-t"><strong>Cookies.</strong> Solo usamos cookies de medición (Google Analytics) si las aceptas. Sin ellas la web funciona igual. <a href="/cookies">Más información</a></p>
   <div class="cookies-btns"><button type="button" class="btn btn-sec" data-ck="denied">Rechazar</button><button type="button" class="btn btn-accion" data-ck="granted">Aceptar</button></div>
 </div>
-<script src="/app.js" defer></script>
+<script src="/app.js?v=${VERSION}" defer></script>
 </body>
 </html>`;
 }

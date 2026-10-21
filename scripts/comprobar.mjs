@@ -34,7 +34,7 @@ for (const f of ficheros) {
   // El visitante no sale de la web: ningún CTA puede llevar a /solicitar de la plataforma.
   if (/href="https?:\/\/[^"]*\/solicitar/.test(src)) errores.push(`${rel}: enlace a /solicitar externo`);
   if (/data-cta/.test(src) && !/id="solicitar"/.test(src) && !/href="\/#solicitar"/.test(src)) errores.push(`${rel}: CTA sin formulario ni enlace a /#solicitar`);
-  for (const m of src.matchAll(/href="(\/[^"#?]*)/g)) {
+  for (const m of src.matchAll(/(?:href|src)="(\/[^"#?]*)/g)) {
     const h = BASE && m[1].startsWith(BASE + "/") ? m[1].slice(BASE.length) : m[1];
     const cands = h.endsWith("/") ? [join(DIST, h, "index.html")] : [join(DIST, h + ".html"), join(DIST, h), join(DIST, h, "index.html")];
     let ok = false;
