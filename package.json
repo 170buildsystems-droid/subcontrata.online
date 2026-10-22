@@ -8,7 +8,8 @@
     "build": "node build.mjs",
     "dev": "node build.mjs && npx -y serve dist -l 4321",
     "check": "node build.mjs && node scripts/comprobar.mjs",
-    "publicar": "bash scripts/publicar-gh-pages.sh"
+    "publicar": "bash scripts/publicar-gh-pages.sh && node scripts/indexnow.mjs",
+    "indexnow": "node scripts/indexnow.mjs"
   },
   "license": "UNLICENSED"
 }

@@ -57,6 +57,10 @@ Alternativa sin GitHub: `npx wrangler pages deploy dist --project-name subcontra
 - Pon `gtmId` y, si usas Ads, `adsConversion`.
 - Sigue `CHECKLIST-LANZAMIENTO.md`.
 
+## IndexNow
+
+Cada `npm run publicar` avisa a Bing, Yandex, Seznam, Naver y Yep (y por Bing a DuckDuckGo, Ecosia, Qwant, ChatGPT/Copilot) de todas las URLs del sitemap (`scripts/indexnow.mjs`, clave en `public/<clave>.txt`). Google no participa en IndexNow: su vía es el sitemap en Search Console.
+
 ## Reglas de contenido
 - Sin nombres de competidores, sin testimonios ni cifras inventadas. Los rangos de precio son orientativos y lo dicen.
 - Plazo: «habitualmente en 48 horas», nunca garantizado.
